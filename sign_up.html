@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ZH-hans">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./style.css">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>注册</title>
+</head>
+
+<body>
+  <form class="formWrapper" id="formWrapper">
+    <div class="row">
+      <label>邮箱</label>
+      <input type="text" name="email" id="email">
+      <span class="error"></span>
+    </div>
+    <div class="row">
+      <label>密码</label>
+      <input type="password" name="password" id="password"></div>
+    <span class="error"></span>
+    <div class="row">
+      <label>确认密码</label>
+      <input type="password_confirmation" name="password_confirmation" id="password_confirmation"></div>
+    <input type="submit" value="注册">
+    <span class="error"></span>
+  </form>
+  <script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script>
+  <script>
+    $('.formWrapper').on('submit', (e) => {
+      let hash = {}
+      e.preventDefault()
+      let need = ['email', 'password', 'password_confirmation']
+      need.forEach((key) => {
+        let value = $('.formWrapper').find(`[name=${key}]`).val()
+        hash[key] = value
+      })
+        $.post('http://localhost:8888/sign_up.html', hash)
+          .then(() => {
+            console.log('成功')
+          }, (request) => {
+            alert(request.responseText)
+          })
+      
+      
+    })
+  </script>
+</body>
+
+</html>
