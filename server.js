@@ -44,8 +44,6 @@ var server = http.createServer(function (request, response) {
     response.write(string)
     response.end()
   } else if (path === '/sign_up.html' && method === 'POST') {
-    response.setHeader('Content-Type', 'text/html;charset=utf-8')
-
     readBody(request).then((body) => {
       var hash = {}
       let strings = body.split('&')
@@ -53,7 +51,7 @@ var server = http.createServer(function (request, response) {
         let parts = string.split('=')
         let key = parts[0]
         let value = parts[1]
-        hash[key] = decodeURIComponent(value) 
+        hash[key] = decodeURIComponent(value)
       })
       let {
         email,
@@ -61,18 +59,29 @@ var server = http.createServer(function (request, response) {
         password_confirmation
       } = hash
       if (email.indexOf('@') === -1) {
+        response.setHeader('Content-Type', 'application/json;charset=utf-8')
         response.statusCode = 400
-        response.write('邮箱错误')
+        response.write(`{
+          "errors":{
+            "email":"invalid"
+          }
+        }`)
       } else if (password !== password_confirmation) {
+        response.setHeader('Content-Type', 'application/json;charset=utf-8')
         response.statusCode = 400
-        response.write('密码不匹配')
-      }else{
+        response.write(`{
+          "errors":{
+            "password":"difference"
+          }
+        }`)
+      } else {
         response.statusCode = 200
+        console.log(hash)
       }
       response.end()
     })
 
-    
+
   } else if (path === '/script') {
     response.setHeader('Content-Type', 'text/javascript')
     response.write('alert("这是javascript控制的")')

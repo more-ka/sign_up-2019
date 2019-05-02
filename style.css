@@ -21,4 +21,7 @@ body{
   padding:0 4px;
   color:red;
 }
-
+.formWrapper > #submit{
+  padding:4px;
+  outline: 0;
+}
