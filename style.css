@@ -8,7 +8,7 @@ body{
 .formWrapper{
   border:1px solid lightblue;
   padding:24px;
-  width:420px;
+  width:440px;
 }
 .formWrapper > .row{
   padding:16px 0;

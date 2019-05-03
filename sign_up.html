@@ -41,7 +41,10 @@
       $('.error').each((index, span) => {
         $(span).text('')
       })
-      
+      if(hash['email'].indexOf('@') === -1){
+        $('#email').siblings('.error').text('邮箱格式错误')
+        return
+      }
       if (hash['email'] === '') {
         $('#email').siblings('.error').text('邮箱为空')
         return
@@ -60,11 +63,13 @@
       } 
       $.post('http://localhost:8888/sign_up.html', hash) 
         .then((response)=>{
-          console.log(response)
+          console.log('成功')
         }, (request)=>{
           let {errors} = request.responseJSON
           if(errors.email && errors.email === 'invalid'){
             $('#email').siblings('#error').text('邮箱格式错误')
+          }else if(errors.email && errors.email === 'inUser'){
+            $('#email').siblings('#error').text('该邮箱已经注册')
           }else if(errors.password && errors.password === 'difference'){
             $('#password').siblings('#error').text('两次密码不一致')
           }

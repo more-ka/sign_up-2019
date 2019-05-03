@@ -75,8 +75,35 @@ var server = http.createServer(function (request, response) {
           }
         }`)
       } else {
-        response.statusCode = 200
-        console.log(hash)
+        let users = fs.readFileSync('./db', 'utf8')
+        users = JSON.parse(users)
+        let inUser = false
+        for (let i = 0; i < users.length; i++) {
+          let user = users[i]
+          if (user.email === email) {
+            inUser = true
+            break;
+          }
+        }
+        if (inUser) {
+          response.statusCode = 400
+          response.setHeader('Content-Type', 'application/json;charset=utf-8')
+          response.write(`{
+            "errors":{
+              "email":"inUser"
+            }
+          }`)
+        } else {
+          response.statusCode = 200
+          users.push({
+            email: email,
+            password: password
+          })
+          let userString = JSON.stringify(users)
+          fs.writeFileSync('./db', userString)
+        }
+        let data = fs.readFileSync('./db', 'utf8')
+        data = JSON.parse(data)
       }
       response.end()
     })
