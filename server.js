@@ -25,12 +25,10 @@ var server = http.createServer(function (request, response) {
 
 
   console.log('得到 HTTP 路径\n' + path)
-  if (path === '/index') {
-    response.setHeader('Content-Type', 'text/html')
-    response.write('<!DOCTYPE html><html lang="ZH-hans"><head><meta charset="UTF-8">' +
-      '<link rel="stylesheet" href="style"></head>' +
-      '<body><h1>你好</h1></body>' +
-      '<script src="script"></script></html>')
+  if (path === '/index.html') {
+    let string = fs.readFileSync('./index.html','utf8')
+    response.setHeader('Content-Type', 'text/html;charset=utf-8')
+    response.write(string)
     response.end()
   } else if (path === '/style.css') {
     let string = fs.readFileSync('./style.css', 'utf8')
@@ -107,10 +105,57 @@ var server = http.createServer(function (request, response) {
       }
       response.end()
     })
-
-
+  } else if (path === '/sign_in.html' && method === 'GET') {
+    let string = fs.readFileSync('./sign_in.html', 'utf8')
+    response.setHeader('Content-Type', 'text/html;charset=utf-8')
+    response.write(string)
+    response.end()
+  } else if (path === '/sign_in.html' && method === 'POST') {
+    readBody(request).then((body) => {
+      let users = fs.readFileSync('./db','utf8')
+      users = JSON.parse(users)
+      var hash = {}
+      let strings = body.split('&')
+      strings.forEach((string) => {
+        let parts = string.split('=')
+        let key = parts[0]
+        let value = parts[1]
+        hash[key] = decodeURIComponent(value)
+      })
+      let {email,password} = hash
+      console.log(hash)
+      console.log(users)
+      if (email.indexOf('@') === -1) {
+        response.setHeader('Content-Type', 'application/json;charset=utf-8')
+        response.statusCode = 400
+        response.write(`{
+          "errors":{
+            "email":"invalid"
+          }
+        }`)
+      }
+      let found = false
+      for(let i=0;i<users.length;i++){
+        if(users[i].email === email && users[i].password === password){
+          found = true
+        }
+      }
+      if(found){
+        response.statusCode = 200
+      }else{
+        response.setHeader('Content-Type', 'application/json;charset=utf-8')
+        response.statusCode = 400
+        response.write(`{
+          "errors":{
+            "email":"error"
+          }
+        }`)
+      }
+      console.log(found)
+    response.end()
+    })
   } else if (path === '/script') {
-    response.setHeader('Content-Type', 'text/javascript')
+    response.setHeader('Content-Type', 'text/javascript;charset=utf-8')
     response.write('alert("这是javascript控制的")')
     response.end()
   } else {

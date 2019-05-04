@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="./style.css">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>注册</title>
+  <title>登录</title>
 </head>
 
 <body>
@@ -21,19 +21,14 @@
       <input type="password" name="password" id="password">
       <span class="error" id="error"></span>
     </div>
-    <div class="row">
-      <label>确认密码</label>
-      <input type="password_confirmation" name="password_confirmation" id="password_confirmation">
-      <span class="error" id="error"></span>
-    </div>
-    <input type="submit" value="注册" id="submit">
+    <input type="submit" value="登录" id="submit">
   </form>
   <script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script>
   <script>
     $('.formWrapper').on('submit', (e) => {
       let hash = {}
       e.preventDefault()
-      let need = ['email', 'password', 'password_confirmation']
+      let need = ['email', 'password']
       need.forEach((key) => {
         let value = $('.formWrapper').find(`[name=${key}]`).val()
         hash[key] = value
@@ -41,6 +36,7 @@
       $('.error').each((index, span) => {
         $(span).text('')
       })
+      
       if (hash['email'] === '') {
         $('#email').siblings('.error').text('邮箱为空')
         return
@@ -53,25 +49,15 @@
         $('#password').siblings('.error').text('密码为空')
         return
       }
-      if (hash['password'] !== hash['password_confirmation']) {
-        $('#password_confirmation').siblings('.error').text('密码不一致')
-        return
-      }
-      if (hash['password_confirmation'] === '') {
-        $('#password_confirmation').siblings('.error').text('确认密码为空')
-        return
-      } 
-      $.post('http://localhost:8888/sign_up.html', hash) 
+      $.post('http://localhost:8888/sign_in.html', hash) 
         .then((response)=>{
-          window.location.href='/sign_in.html'
+          window.location.href='/index.html'
         }, (request)=>{
           let {errors} = request.responseJSON
           if(errors.email && errors.email === 'invalid'){
             $('#email').siblings('#error').text('邮箱格式错误')
-          }else if(errors.email && errors.email === 'inUser'){
-            $('#email').siblings('#error').text('该邮箱已经注册')
-          }else if(errors.password && errors.password === 'difference'){
-            $('#password').siblings('#error').text('两次密码不一致')
+          }else if(errors.email && errors.email === 'error'){
+            $('#email').siblings('#error').text('账号或密码错误')
           }
         })
 
