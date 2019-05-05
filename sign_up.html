@@ -23,7 +23,7 @@
     </div>
     <div class="row">
       <label>确认密码</label>
-      <input type="password_confirmation" name="password_confirmation" id="password_confirmation">
+      <input type="password" name="password_confirmation" id="password_confirmation">
       <span class="error" id="error"></span>
     </div>
     <input type="submit" value="注册" id="submit">
@@ -67,12 +67,18 @@
         }, (request)=>{
           let {errors} = request.responseJSON
           if(errors.email && errors.email === 'invalid'){
-            $('#email').siblings('#error').text('邮箱格式错误')
-          }else if(errors.email && errors.email === 'inUser'){
-            $('#email').siblings('#error').text('该邮箱已经注册')
-          }else if(errors.password && errors.password === 'difference'){
-            $('#password').siblings('#error').text('两次密码不一致')
-          }
+        $('#email').siblings('.error').text('请输入邮箱')
+      }else if(errors.email && errors.email === 'error'){
+        $('#email').siblings('.error').text('邮箱格式错误')
+      }else if(errors.email && errors.email === 'inUser'){
+        $('#email').siblings('.error').text('邮箱已经注册')
+      }else if(errors.password && errors.password ==='invalid'){
+        $('#password').siblings('.error').text('请输入密码')
+      }else if(errors.password_confirmation && errors.password_confirmation ==='invalid'){
+        $('#password_confirmation').siblings('.error').text('请确认密码')
+      }else if(errors.password && errors.password ==='error'){
+        $('#password_confirmation').siblings('.error').text('确认密码错误')
+      }
         })
 
     })

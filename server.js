@@ -100,8 +100,6 @@ var server = http.createServer(function (request, response) {
           let userString = JSON.stringify(users)
           fs.writeFileSync('./db', userString)
         }
-        let data = fs.readFileSync('./db', 'utf8')
-        data = JSON.parse(data)
       }
       response.end()
     })
