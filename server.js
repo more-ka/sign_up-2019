@@ -26,7 +26,40 @@ var server = http.createServer(function (request, response) {
 
   console.log('得到 HTTP 路径\n' + path)
   if (path === '/index.html') {
-    let string = fs.readFileSync('./index.html','utf8')
+    let string = fs.readFileSync('./index.html', 'utf8')
+    let cookies = request.headers.cookie
+    let foundCookie = false
+    try{
+      cookies = cookies.split()
+    }catch(err){
+    }
+    let hash = []
+    try{
+      cookies.forEach((cookie) => {
+        let parts = cookie.split('=')
+        let key = parts[0]
+        let value = parts[1]
+        hash[key] = value
+      })
+      let users = fs.readFileSync('./db', 'utf8')
+      users = JSON.parse(users)
+      for (let i = 0; i < users.length; i++) {
+        if (users[i].email === hash.user_email) {
+          foundCookie = true
+          break;
+        }
+      }
+    }
+    catch(err){
+
+    }
+    
+    if (foundCookie) {
+      string = string.replace('__replace__', hash.user_email)
+    } else {
+      string = string.replace('__replace__', "未登录")
+    }
+    response.statusCode = 200
     response.setHeader('Content-Type', 'text/html;charset=utf-8')
     response.write(string)
     response.end()
@@ -110,7 +143,7 @@ var server = http.createServer(function (request, response) {
     response.end()
   } else if (path === '/sign_in.html' && method === 'POST') {
     readBody(request).then((body) => {
-      let users = fs.readFileSync('./db','utf8')
+      let users = fs.readFileSync('./db', 'utf8')
       users = JSON.parse(users)
       var hash = {}
       let strings = body.split('&')
@@ -120,9 +153,11 @@ var server = http.createServer(function (request, response) {
         let value = parts[1]
         hash[key] = decodeURIComponent(value)
       })
-      let {email,password} = hash
-      console.log(hash)
-      console.log(users)
+      let {
+        email,
+        password
+      } = hash
+
       if (email.indexOf('@') === -1) {
         response.setHeader('Content-Type', 'application/json;charset=utf-8')
         response.statusCode = 400
@@ -133,14 +168,16 @@ var server = http.createServer(function (request, response) {
         }`)
       }
       let found = false
-      for(let i=0;i<users.length;i++){
-        if(users[i].email === email && users[i].password === password){
+      for (let i = 0; i < users.length; i++) {
+        if (users[i].email === email && users[i].password === password) {
           found = true
+          var currentUser = users[i].email
         }
       }
-      if(found){
+      if (found) {
+        response.setHeader('Set-Cookie', `user_email=${currentUser}`)
         response.statusCode = 200
-      }else{
+      } else {
         response.setHeader('Content-Type', 'application/json;charset=utf-8')
         response.statusCode = 400
         response.write(`{
@@ -149,8 +186,7 @@ var server = http.createServer(function (request, response) {
           }
         }`)
       }
-      console.log(found)
-    response.end()
+      response.end()
     })
   } else if (path === '/script') {
     response.setHeader('Content-Type', 'text/javascript;charset=utf-8')
